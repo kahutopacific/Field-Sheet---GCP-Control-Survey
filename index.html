@@ -33,6 +33,8 @@
   .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
   .btn-green { background: var(--green); color: var(--white); }
   .btn-green:hover { background: #15803d; }
+  .btn-navy { background: var(--navy); color: var(--white); border: none; }
+  .btn-navy:hover { background: var(--navy-mid); }
   .btn-red-sm { background: transparent; border: 1.5px solid var(--red); color: var(--red); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-weight: 600; font-size: 11px; padding: 4px 9px; border-radius: 5px; cursor: pointer; transition: all 0.15s; }
   .btn-red-sm:hover { background: var(--red); color: var(--white); }
 
@@ -178,13 +180,49 @@
 
   /* PRINT */
   @media print {
-    .page-header, .submit-panel, #toast, .add-row-btn, .photo-btn, .photo-del, .modal-overlay, .sig-bar .btn-red-sm, .sig-pen-size { display: none !important; }
-    .form-card { box-shadow: none; break-inside: avoid; }
+    /* Hide interactive UI */
+    .page-header, .submit-panel, #toast, .add-row-btn,
+    .photo-btn, .photo-del, .modal-overlay,
+    .sig-bar .btn-red-sm, .sig-pen-size,
+    #resume-banner { display: none !important; }
+
+    body { background: white; font-size: 11px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .form-card { box-shadow: none; break-inside: avoid; margin-bottom: 12px; }
     .section-body.hidden { display: block !important; }
     .section-toggle { display: none !important; }
     .container { padding: 0; max-width: 100%; }
-    body { background: white; font-size: 11px; }
     .sig-canvas { border: 1px solid #ccc; }
+    .progress-wrap, .doc-id-bar { display: none; }
+
+    /* Photos — 2 per row, large enough to be useful */
+    .photo-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 12px !important;
+      margin-top: 8px;
+    }
+    .photo-card {
+      break-inside: avoid;
+      border: 1px solid #ccc !important;
+      border-radius: 4px !important;
+    }
+    .photo-card img {
+      height: 180px !important;
+      width: 100% !important;
+      object-fit: cover !important;
+    }
+    .photo-caption {
+      font-size: 10px !important;
+      color: #333 !important;
+      padding: 3px 5px !important;
+      display: block !important;
+    }
+    .photo-ts {
+      font-size: 9px !important;
+      color: #777 !important;
+    }
+    /* Make sure photo section labels are visible */
+    .sublabel { display: block !important; }
   }
 
   /* RESUME BANNER */
@@ -264,8 +302,7 @@
   <div class="header-actions">
     <button class="btn btn-outline" onclick="openDrafts()">📂 Drafts</button>
     <button class="btn btn-outline" onclick="clearForm()">↺</button>
-    <button class="btn btn-outline" onclick="window.print()">⎙ Print</button>
-    <button class="btn btn-gold" onclick="exportJSON()">⬇ Export</button>
+    <button class="btn btn-outline" onclick="printOrGuide()">⎙ Print / PDF</button>
   </div>
 </div>
 
@@ -571,10 +608,9 @@
       <p>Save a named draft to resume later, export JSON for GitHub, or print to PDF.</p>
     </div>
     <div class="submit-actions">
-      <button class="btn btn-outline" onclick="window.print()">⎙ Print / PDF</button>
+      <button class="btn btn-outline" onclick="printOrGuide()">⎙ Print / PDF</button>
       <button class="btn btn-gold" onclick="generateSummary()">✉ Summary</button>
       <button class="btn btn-green" onclick="promptSaveDraft()">💾 Save Draft</button>
-      <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5);" onclick="exportJSON()">⬇ Export JSON</button>
     </div>
   </div>
 
@@ -604,7 +640,10 @@
       <div id="drafts-list"></div>
 
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--grey-line);">
-        <div style="font-size:11px;font-weight:600;color:var(--grey-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Load from exported JSON file</div>
+        <div style="font-size:11px;font-weight:600;color:var(--grey-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Transfer to another device</div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:10px;">
+          <button class="btn btn-navy" style="flex:1;justify-content:center;" onclick="exportJSON();closeModal('draftsModal')">⬇ Export current form as JSON</button>
+        </div>
         <label style="display:flex;align-items:center;gap:10px;padding:14px;border:2px dashed var(--grey-line);border-radius:8px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--gold)';this.style.background='var(--gold-light)'" onmouseout="this.style.borderColor='var(--grey-line)';this.style.background='transparent'">
           <input type="file" accept=".json" onchange="loadFromJSON(event)" style="display:none;">
           <span style="font-size:24px;">📄</span>
@@ -634,7 +673,6 @@
       <pre id="summaryText"></pre>
       <div style="display:flex;gap:8px;margin-top:13px;flex-wrap:wrap;">
         <button class="btn btn-gold" onclick="copySummary()">Copy to Clipboard</button>
-        <button class="btn btn-green" onclick="exportJSON()">Export JSON</button>
         <button class="btn btn-outline" style="border-color:var(--navy);color:var(--navy);" onclick="closeModal('summaryModal')">Close</button>
       </div>
     </div>
@@ -1319,6 +1357,97 @@ function loadFromJSON(e) {
   reader.readAsText(file);
   e.target.value = '';
 }
+// ════════════════════════════════════════════════════════════════════
+// PRINT / PDF  —  iOS-aware
+// ════════════════════════════════════════════════════════════════════
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function expandAllSections() {
+  document.querySelectorAll('.section-body.hidden').forEach(body => {
+    body.classList.remove('hidden');
+    const toggle = body.previousElementSibling?.querySelector('.section-toggle');
+    if (toggle) toggle.classList.add('open');
+  });
+}
+
+function printOrGuide() {
+  expandAllSections(); // always expand first so nothing is missing from PDF
+  if (isIOS()) {
+    document.getElementById('iosPdfModal').classList.add('open');
+  } else {
+    setTimeout(() => window.print(), 150); // small delay to let DOM update
+  }
+}
+
+function expandAllAndClose() {
+  expandAllSections();
+  closeModal('iosPdfModal');
+  showToast('All sections expanded — now follow the steps above');
+}
 </script>
+
+<!-- iOS PDF GUIDE MODAL -->
+<div class="modal-overlay" id="iosPdfModal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-head">
+      <span>📄 Save as PDF on iPhone</span>
+      <button class="modal-close" onclick="closeModal('iosPdfModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--grey-text);margin-bottom:16px;">
+        Safari on iPhone doesn't support direct printing, but you can save a PDF in a few taps:
+      </p>
+
+      <!-- Step 1 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:10px;">
+        <div style="background:var(--navy);color:var(--gold);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Tap the Share button</div>
+          <div style="font-size:12px;color:var(--grey-text);">The <strong>□↑</strong> icon at the bottom of your Safari screen (or top-right on iPad).</div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:10px;">
+        <div style="background:var(--navy);color:var(--gold);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Scroll down and tap "Print"</div>
+          <div style="font-size:12px;color:var(--grey-text);">In the share sheet, scroll down until you see the <strong>Print</strong> option and tap it.</div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:10px;">
+        <div style="background:var(--navy);color:var(--gold);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Pinch open the page preview</div>
+          <div style="font-size:12px;color:var(--grey-text);">In the print preview, <strong>pinch outward</strong> (zoom gesture) on the page thumbnail. This converts it to a PDF.</div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:16px;">
+        <div style="background:var(--gold);color:var(--navy);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Tap Share <strong>□↑</strong> → Save to Files</div>
+          <div style="font-size:12px;color:var(--grey-text);">A new share sheet appears. Tap <strong>Save to Files</strong> to save the PDF to your iPhone, or share it via email / WhatsApp.</div>
+        </div>
+      </div>
+
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:7px;padding:10px 13px;font-size:12px;color:#166534;margin-bottom:14px;">
+        💡 <strong>Tip:</strong> Photos you've added will appear in the PDF — 2 per row with captions. Make sure all sections are expanded before saving, otherwise collapsed sections won't print.
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="expandAllAndClose()">Expand All Sections</button>
+        <button class="btn btn-outline" style="border-color:var(--navy);color:var(--navy);" onclick="closeModal('iosPdfModal')">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
