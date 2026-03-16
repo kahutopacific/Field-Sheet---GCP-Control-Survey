@@ -180,13 +180,24 @@
 
   /* PRINT */
   @media print {
+    /* Keep header visible as a static block at top of page */
+    .page-header {
+      position: static !important;
+      display: flex !important;
+      border-bottom: 4px solid #F5B731 !important;
+      margin-bottom: 12px;
+      padding: 10px 0 !important;
+    }
+    .header-actions { display: none !important; }
+
     /* Hide interactive UI */
-    .page-header, .submit-panel, #toast, .add-row-btn,
+    .submit-panel, #toast, .add-row-btn,
     .photo-btn, .photo-del, .modal-overlay,
     .sig-bar .btn-red-sm, .sig-pen-size,
     #resume-banner { display: none !important; }
 
     body { background: white; font-size: 11px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page-header { background: #1a1a1a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .form-card { box-shadow: none; break-inside: avoid; margin-bottom: 12px; }
     .section-body.hidden { display: block !important; }
     .section-toggle { display: none !important; }
@@ -221,7 +232,6 @@
       font-size: 9px !important;
       color: #777 !important;
     }
-    /* Make sure photo section labels are visible */
     .sublabel { display: block !important; }
   }
 
@@ -1365,6 +1375,10 @@ function isIOS() {
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
+function isAndroid() {
+  return /Android/.test(navigator.userAgent);
+}
+
 function expandAllSections() {
   document.querySelectorAll('.section-body.hidden').forEach(body => {
     body.classList.remove('hidden');
@@ -1374,17 +1388,20 @@ function expandAllSections() {
 }
 
 function printOrGuide() {
-  expandAllSections(); // always expand first so nothing is missing from PDF
+  expandAllSections();
   if (isIOS()) {
     document.getElementById('iosPdfModal').classList.add('open');
+  } else if (isAndroid()) {
+    document.getElementById('androidPdfModal').classList.add('open');
   } else {
-    setTimeout(() => window.print(), 150); // small delay to let DOM update
+    setTimeout(() => window.print(), 150);
   }
 }
 
 function expandAllAndClose() {
   expandAllSections();
   closeModal('iosPdfModal');
+  closeModal('androidPdfModal');
   showToast('All sections expanded — now follow the steps above');
 }
 </script>
@@ -1444,6 +1461,66 @@ function expandAllAndClose() {
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-gold" onclick="expandAllAndClose()">Expand All Sections</button>
         <button class="btn btn-outline" style="border-color:var(--navy);color:var(--navy);" onclick="closeModal('iosPdfModal')">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANDROID PDF GUIDE MODAL -->
+<div class="modal-overlay" id="androidPdfModal">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-head">
+      <span>📄 Save as PDF on Android</span>
+      <button class="modal-close" onclick="closeModal('androidPdfModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--grey-text);margin-bottom:16px;">
+        Chrome on Android has a built-in Save to PDF feature. Follow these steps:
+      </p>
+
+      <!-- Step 1 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:10px;">
+        <div style="background:var(--navy);color:var(--gold);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Tap the ⋮ menu (top right)</div>
+          <div style="font-size:12px;color:var(--grey-text);">The three-dot menu in the top-right corner of Chrome.</div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:10px;">
+        <div style="background:var(--navy);color:var(--gold);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Tap "Share"</div>
+          <div style="font-size:12px;color:var(--grey-text);">Then select <strong>Print</strong> from the share options.</div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:10px;">
+        <div style="background:var(--navy);color:var(--gold);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Select "Save as PDF" as the printer</div>
+          <div style="font-size:12px;color:var(--grey-text);">In the print dialog, tap the printer name at the top and choose <strong>Save as PDF</strong>.</div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--grey-bg);border-radius:8px;margin-bottom:16px;">
+        <div style="background:var(--gold);color:var(--navy);font-weight:700;font-size:13px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:3px;">Tap the Download / Save button</div>
+          <div style="font-size:12px;color:var(--grey-text);">The PDF saves to your Downloads folder. You can then share it via email, WhatsApp, or Google Drive.</div>
+        </div>
+      </div>
+
+      <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:7px;padding:10px 13px;font-size:12px;color:#166534;margin-bottom:14px;">
+        💡 <strong>Tip:</strong> Photos will appear in the PDF — 2 per row with captions. Make sure all sections are expanded before saving.
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="expandAllAndClose()">Expand All Sections</button>
+        <button class="btn btn-outline" style="border-color:var(--navy);color:var(--navy);" onclick="closeModal('androidPdfModal')">Got it</button>
       </div>
     </div>
   </div>
