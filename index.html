@@ -341,9 +341,9 @@
         <div class="field"><label>Location / Site *</label><input type="text" id="location" placeholder="e.g. Kings Road, Nadi" oninput="updateProgress()"></div>
         <div class="field"><label>Date *</label><input type="date" id="surveyDate" oninput="updateProgress()"></div>
         <div class="field" style="grid-column:1/-1;">
-          <label>Surveyor(s) * <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--grey-text);">— add one per line</span></label>
+          <label>Surveyor(s) * <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--grey-text);">— select or add additional surveyors</span></label>
           <div id="surveyor-list" style="display:flex;flex-direction:column;gap:6px;"></div>
-          <button type="button" onclick="addSurveyor()" style="margin-top:5px;background:none;border:1.5px dashed var(--grey-line);color:var(--grey-text);font-family:system-ui,sans-serif;font-size:11px;font-weight:600;padding:6px;border-radius:6px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--grey-line)';this.style.color='var(--grey-text)'">+ Add Surveyor</button>
+          <button type="button" onclick="addSurveyor()" style="margin-top:6px;background:none;border:1.5px dashed var(--grey-line);color:var(--grey-text);font-family:system-ui,sans-serif;font-size:11px;font-weight:600;padding:6px;border-radius:6px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--grey-line)';this.style.color='var(--grey-text)'">+ Add Surveyor</button>
         </div>
         <div class="field"><label>Type of Works</label>
           <select id="workType" onchange="toggleOther(this,'workType-other')">
@@ -380,19 +380,25 @@
       <div class="status-dot" id="dot-2"></div><div class="section-toggle open">▾</div>
     </div>
     <div class="section-body" id="sb-2">
-      <div class="field"><label>Instrument Type</label>
+      <div class="field"><label>Instrument Type <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--grey-text);">— select all that apply</span></label>
         <div class="check-group" id="instrument-group">
-          <label class="check-item" onclick="toggleCheck(this,'instrument-group',false)"><input type="radio" name="inst"><div class="box">✓</div>GNSS Rover</label>
-          <label class="check-item" onclick="toggleCheck(this,'instrument-group',false)"><input type="radio" name="inst"><div class="box">✓</div>GNSS Base</label>
-          <label class="check-item" onclick="toggleCheck(this,'instrument-group',false)"><input type="radio" name="inst"><div class="box">✓</div>Total Station</label>
-          <label class="check-item" onclick="toggleCheck(this,'instrument-group',false)"><input type="radio" name="inst"><div class="box">✓</div>UAV</label>
-          <label class="check-item" onclick="toggleCheck(this,'instrument-group',false)" data-other="instrument-other"><input type="radio" name="inst"><div class="box">✓</div>Other</label>
+          <label class="check-item" onmousedown="event.preventDefault();toggleCheck(this,'instrument-group',true)" ontouchend="event.preventDefault();toggleCheck(this,'instrument-group',true)" data-serial="1169-11025" data-name="Sokkia Rover"><input type="checkbox"><div class="box">✓</div>Sokkia Rover</label>
+          <label class="check-item" onmousedown="event.preventDefault();toggleCheck(this,'instrument-group',true)" ontouchend="event.preventDefault();toggleCheck(this,'instrument-group',true)" data-serial="1149-11298" data-name="Sokkia Base"><input type="checkbox"><div class="box">✓</div>Sokkia Base</label>
+          <label class="check-item" onmousedown="event.preventDefault();toggleCheck(this,'instrument-group',true)" ontouchend="event.preventDefault();toggleCheck(this,'instrument-group',true)" data-serial="824340CFDCF950A7" data-name="Emlid RS2+"><input type="checkbox"><div class="box">✓</div>Emlid RS2+</label>
+          <label class="check-item" onmousedown="event.preventDefault();toggleCheck(this,'instrument-group',true)" ontouchend="event.preventDefault();toggleCheck(this,'instrument-group',true)" data-serial="8243A14E5783E1A1" data-name="Emlid RS3"><input type="checkbox"><div class="box">✓</div>Emlid RS3</label>
+          <label class="check-item" onmousedown="event.preventDefault();toggleCheck(this,'instrument-group',true)" ontouchend="event.preventDefault();toggleCheck(this,'instrument-group',true)" data-serial="" data-name="UAV"><input type="checkbox"><div class="box">✓</div>UAV (DJI M300)</label>
+          <label class="check-item" onmousedown="event.preventDefault();toggleCheck(this,'instrument-group',true)" ontouchend="event.preventDefault();toggleCheck(this,'instrument-group',true)" data-other="instrument-other" data-serial="" data-name=""><input type="checkbox"><div class="box">✓</div>Other</label>
         </div>
         <input type="text" id="instrument-other" placeholder="Specify instrument…" style="display:none;margin-top:7px;font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;width:100%;">
       </div>
       <div class="divider"></div>
       <div class="field-grid cols-2">
-        <div class="field"><label>Instrument ID / Serial No.</label><input type="text" id="instrSerial" placeholder="e.g. SN-20241023-001"></div>
+        <div class="field">
+          <label>Instrument ID(s) / Serial No(s). <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--grey-text);">— auto-fills, tap to edit</span></label>
+          <div id="serial-list" style="display:flex;flex-direction:column;gap:6px;">
+            <input type="text" id="instrSerial" placeholder="Select instrument(s) above to auto-fill" style="font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);width:100%;">
+          </div>
+        </div>
         <div class="field"><label>Calibration Checked</label>
           <div class="yes-no-field">
             <button class="yes-no-btn yes" onclick="setYesNo(this)">✓ Yes</button>
@@ -534,7 +540,16 @@
         <div class="field"><label>Independent Check on GCPs?</label>
           <div class="yes-no-field"><button class="yes-no-btn yes" onclick="setYesNo(this)">✓ Yes</button><button class="yes-no-btn no" onclick="setYesNo(this)">✕ No</button></div>
         </div>
-        <div class="field"><label>Checked By (Name)</label><input type="text" id="checkedBy" placeholder="Independent checker name"></div>
+        <div class="field"><label>Checked By (Name)</label>
+          <select id="checkedBy">
+            <option value="">— Select —</option>
+            <option>Jone Nawele</option>
+            <option>Solomon Chant</option>
+            <option>Kavitesh Prakash</option>
+            <option value="Other">Other</option>
+          </select>
+          <input type="text" id="checkedBy-other" placeholder="Enter name…" style="display:none;margin-top:6px;font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;width:100%;" oninput="syncCheckedBy()">
+        </div>
         <div class="field"><label>Check Date</label><input type="date" id="checkDate"></div>
       </div>
     </div>
@@ -577,7 +592,12 @@
     </div>
     <div class="section-body" id="sb-8">
       <div class="field-grid cols-2">
-        <div class="field"><label>Surveyor Full Name *</label><input type="text" id="signName" placeholder="Print full name" oninput="updateProgress()"></div>
+        <div class="field">
+          <label>Surveyor(s) Full Name *</label>
+          <div id="signName-display" style="font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);background:var(--grey-bg);min-height:38px;line-height:1.5;">—</div>
+          <input type="hidden" id="signName">
+          <p style="font-size:10px;color:var(--grey-text);margin-top:4px;">Pre-filled from Section 1 surveyors</p>
+        </div>
         <div class="field"><label>Sign-Off Date *</label><input type="date" id="signDate" oninput="updateProgress()"></div>
       </div>
 
@@ -702,15 +722,17 @@ function toggleSection(h) {
 
 // ── CHECKBOXES — with "Other" reveal ─────────────────────────────────
 function toggleCheck(el, gid, multi) {
+  // Prevent the label's default behaviour from also toggling the hidden checkbox
+  // which would cause a double-toggle (check then immediately uncheck)
   if (!multi) document.querySelectorAll('#'+gid+' .check-item').forEach(i=>i.classList.remove('checked'));
   el.classList.toggle('checked');
-  // Handle Other reveal for check-item groups
+  // Handle Other reveal
   const otherId = el.getAttribute('data-other');
   if (otherId) {
     const inp = document.getElementById(otherId);
     if (inp) inp.style.display = el.classList.contains('checked') ? 'block' : 'none';
   }
-  // If deselecting "Other" in a radio group, hide all other reveals in that group
+  // Hide Other reveals that are no longer checked (radio groups)
   if (!multi) {
     document.querySelectorAll('#'+gid+' .check-item[data-other]').forEach(item => {
       if (!item.classList.contains('checked')) {
@@ -719,6 +741,10 @@ function toggleCheck(el, gid, multi) {
         if (tinp) tinp.style.display = 'none';
       }
     });
+  }
+  // Always update serial list when instrument group changes (works for both radio + checkbox)
+  if (gid === 'instrument-group') {
+    updateSerialList();
   }
 }
 function toggleChecklist(el) { el.classList.toggle('checked'); }
@@ -739,36 +765,151 @@ function toggleOther(sel, targetId) {
 }
 
 // ── MULTI-SURVEYOR LIST ────────────────────────────────────────────────
+const SURVEYOR_NAMES = ['Jone Nawele', 'Solomon Chant', 'Kavitesh Prakash'];
+
 function addSurveyor(value) {
   const list = document.getElementById('surveyor-list');
   const row = document.createElement('div');
-  row.style.cssText = 'display:flex;gap:6px;align-items:center;';
-  const inp = document.createElement('input');
-  inp.type = 'text';
-  inp.className = 'surveyor-entry';
-  inp.placeholder = 'Full name';
-  inp.value = value || '';
-  inp.style.cssText = 'flex:1;font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);';
-  inp.addEventListener('focus', () => { inp.style.borderColor='var(--gold)'; inp.style.boxShadow='0 0 0 3px rgba(245,183,49,0.15)'; });
-  inp.addEventListener('blur', () => { inp.style.borderColor='var(--grey-line)'; inp.style.boxShadow='none'; });
-  inp.addEventListener('input', updateProgress);
+  row.style.cssText = 'display:flex;gap:6px;align-items:flex-start;flex-direction:column;';
+
+  const selRow = document.createElement('div');
+  selRow.style.cssText = 'display:flex;gap:6px;align-items:center;width:100%;';
+
+  // Dropdown
+  const sel = document.createElement('select');
+  sel.className = 'surveyor-entry';
+  sel.style.cssText = 'flex:1;font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);background:var(--white);';
+  const blank = document.createElement('option'); blank.value=''; blank.textContent='— Select surveyor —'; sel.appendChild(blank);
+  SURVEYOR_NAMES.forEach(n => { const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o); });
+  const otherOpt = document.createElement('option'); otherOpt.value='Other'; otherOpt.textContent='Other'; sel.appendChild(otherOpt);
+
+  // Set value if provided
+  if (value) {
+    const match = SURVEYOR_NAMES.includes(value);
+    if (match) { sel.value = value; }
+    else { sel.value = 'Other'; }
+  }
+
+  // Other text input
+  const otherInp = document.createElement('input');
+  otherInp.type = 'text';
+  otherInp.placeholder = 'Enter name…';
+  otherInp.style.cssText = 'width:100%;font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);display:none;margin-top:4px;';
+  if (value && !SURVEYOR_NAMES.includes(value) && value !== '') otherInp.value = value;
+
+  sel.addEventListener('focus', () => { sel.style.borderColor='var(--gold)'; sel.style.boxShadow='0 0 0 3px rgba(245,183,49,0.15)'; });
+  sel.addEventListener('blur',  () => { sel.style.borderColor='var(--grey-line)'; sel.style.boxShadow='none'; });
+  sel.addEventListener('change', () => {
+    otherInp.style.display = sel.value === 'Other' ? 'block' : 'none';
+    if (sel.value !== 'Other') otherInp.value = '';
+    syncSignName(); updateProgress();
+  });
+  otherInp.addEventListener('input', () => { syncSignName(); updateProgress(); });
+
+  // Show Other input if restoring an "Other" value
+  if (value && !SURVEYOR_NAMES.includes(value) && value !== '') {
+    otherInp.style.display = 'block';
+  }
+
+  // Delete button
   const del = document.createElement('button');
-  del.type = 'button';
-  del.textContent = '✕';
-  del.title = 'Remove';
-  del.style.cssText = 'background:none;border:1.5px solid var(--red);color:var(--red);border-radius:5px;width:30px;height:34px;cursor:pointer;font-size:12px;flex-shrink:0;transition:all 0.15s;';
-  del.onmouseover = () => { del.style.background='var(--red)'; del.style.color='white'; };
-  del.onmouseout = () => { del.style.background='none'; del.style.color='var(--red)'; };
-  del.onclick = () => { row.remove(); updateProgress(); };
-  row.appendChild(inp);
-  row.appendChild(del);
+  del.type='button'; del.textContent='✕'; del.title='Remove';
+  del.style.cssText='background:none;border:1.5px solid var(--red);color:var(--red);border-radius:5px;width:30px;height:36px;cursor:pointer;font-size:12px;flex-shrink:0;transition:all 0.15s;';
+  del.onmouseover=()=>{ del.style.background='var(--red)'; del.style.color='white'; };
+  del.onmouseout=()=>{ del.style.background='none'; del.style.color='var(--red)'; };
+  del.onclick=()=>{ row.remove(); syncSignName(); updateProgress(); };
+
+  selRow.appendChild(sel);
+  selRow.appendChild(del);
+  row.appendChild(selRow);
+  row.appendChild(otherInp);
   list.appendChild(row);
-  inp.focus();
+  syncSignName();
   updateProgress();
 }
 
 function getSurveyors() {
-  return [...document.querySelectorAll('.surveyor-entry')].map(i=>i.value.trim()).filter(Boolean);
+  const names = [];
+  document.querySelectorAll('#surveyor-list .surveyor-entry').forEach(sel => {
+    if (sel.value === 'Other') {
+      const inp = sel.closest('div').parentElement.querySelector('input[type="text"]');
+      const v = inp?.value?.trim();
+      if (v) names.push(v);
+    } else if (sel.value) {
+      names.push(sel.value);
+    }
+  });
+  return names;
+}
+
+// Pre-fill §8 name display from §1 surveyors
+function syncSignName() {
+  const names = getSurveyors();
+  const display = document.getElementById('signName-display');
+  const hidden  = document.getElementById('signName');
+  const joined  = names.join(', ') || '—';
+  if (display) display.textContent = joined;
+  if (hidden)  hidden.value = joined !== '—' ? joined : '';
+  updateProgress();
+}
+
+// §6 Checked By — show Other input
+function syncCheckedBy() { /* handled by oninput on the other input */ }
+document.addEventListener('DOMContentLoaded', () => {
+  const cbSel = document.getElementById('checkedBy');
+  if (cbSel) {
+    cbSel.addEventListener('change', () => {
+      const other = document.getElementById('checkedBy-other');
+      if (other) other.style.display = cbSel.value === 'Other' ? 'block' : 'none';
+    });
+  }
+});
+
+// Multi-select serial list — rebuild when instruments change
+function updateSerialList() {
+  const list = document.getElementById('serial-list');
+  if (!list) return;
+  const selected = [...document.querySelectorAll('#instrument-group .check-item.checked')];
+  const entries = selected.map(el => ({
+    name: el.getAttribute('data-name') || el.textContent.trim(),
+    serial: el.getAttribute('data-serial') || ''
+  })).filter(e => e.name && e.name !== 'Other');
+
+  list.innerHTML = '';
+  if (entries.length === 0) {
+    const inp = document.createElement('input');
+    inp.type='text'; inp.id='instrSerial';
+    inp.placeholder='Select instrument(s) above to auto-fill';
+    inp.style.cssText='font-family:system-ui,sans-serif;font-size:14px;padding:8px 11px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);width:100%;';
+    list.appendChild(inp);
+    return;
+  }
+
+  entries.forEach((e, i) => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;align-items:center;gap:8px;';
+    const lbl = document.createElement('span');
+    lbl.textContent = e.name + ':';
+    lbl.style.cssText = 'font-size:11px;font-weight:600;color:var(--grey-text);white-space:nowrap;min-width:90px;';
+    const inp = document.createElement('input');
+    inp.type='text';
+    if (i === 0) inp.id = 'instrSerial'; // keep first as primary ID for collect()
+    inp.setAttribute('data-instrument', e.name);
+    inp.value = e.serial;
+    inp.placeholder = e.serial ? '' : 'Enter serial…';
+    inp.style.cssText='flex:1;font-family:system-ui,sans-serif;font-size:13px;padding:7px 10px;border:1.5px solid var(--grey-line);border-radius:6px;color:var(--navy);';
+    // Flash gold on auto-fill
+    if (e.serial) {
+      inp.style.borderColor='var(--gold)';
+      inp.style.boxShadow='0 0 0 3px rgba(245,183,49,0.2)';
+      setTimeout(() => { inp.style.borderColor=''; inp.style.boxShadow=''; }, 1500);
+    }
+    inp.addEventListener('focus',()=>{ inp.style.borderColor='var(--gold)'; inp.style.boxShadow='0 0 0 3px rgba(245,183,49,0.15)'; });
+    inp.addEventListener('blur', ()=>{ inp.style.borderColor='var(--grey-line)'; inp.style.boxShadow='none'; });
+    wrap.appendChild(lbl);
+    wrap.appendChild(inp);
+    list.appendChild(wrap);
+  });
 }
 
 // ── YES/NO ────────────────────────────────────────────────────────────
@@ -829,7 +970,7 @@ function showToast(msg){
 
 // ── PROGRESS ──────────────────────────────────────────────────────────
 function updateProgress(){
-  const textReq=['projName','location','surveyDate','signName','signDate'];
+  const textReq=['projName','location','surveyDate','signDate'];
   const textFilled = textReq.filter(id=>(document.getElementById(id)||{}).value?.trim()).length;
   const hasSurveyor = getSurveyors().length > 0 ? 1 : 0;
   const total = textReq.length + 1;
@@ -970,7 +1111,18 @@ function collect(){
 
   d.weather=[...document.querySelectorAll('#weather-group .check-item.checked')].map(e=>e.textContent.trim());
   d.weatherOther = document.getElementById('weather-other')?.value || '';
-  d.instrumentType=[...document.querySelectorAll('#instrument-group .check-item.checked')].map(e=>e.textContent.trim());
+  // Collect all instrument serials (one per selected instrument)
+  d.instrSerials = [];
+  document.querySelectorAll('#serial-list input[type="text"]').forEach(inp => {
+    const name = inp.getAttribute('data-instrument') || 'Instrument';
+    d.instrSerials.push({ name, serial: inp.value });
+  });
+  d.instrSerial = d.instrSerials.map(e => e.name + ': ' + (e.serial||'—')).join(' | ');
+
+  // Resolve checkedBy Other
+  const cbSel = document.getElementById('checkedBy');
+  const cbOther = document.getElementById('checkedBy-other');
+  d.checkedBy = cbSel?.value === 'Other' ? (cbOther?.value?.trim() || 'Other') : (cbSel?.value || '');
   d.instrumentOther = document.getElementById('instrument-other')?.value || '';
   d.gcpChecklist=[...document.querySelectorAll('.checklist-item')].map(el=>({text:el.textContent.trim(),checked:el.classList.contains('checked')}));
 
@@ -1100,27 +1252,37 @@ function restoreForm(d) {
   setVal('projName', d.projName); setVal('jobNo', d.jobNo);
   setVal('location', d.location); setVal('surveyDate', d.surveyDate);
   setVal('workType', d.workType);
-  setVal('instrSerial', d.instrSerial); setVal('calDate', d.calDate);
+  setVal('calDate', d.calDate);
   setVal('ctrlPointId', d.ctrlPointId); setVal('coordSys', d.coordSys);
-  setVal('checkedBy', d.checkedBy); setVal('checkDate', d.checkDate);
+  setVal('checkDate', d.checkDate);
   setVal('comments', d.comments);
-  setVal('signName', d.signName); setVal('signDate', d.signDate);
+  setVal('signDate', d.signDate);
 
   // Other fields
-  ['workType-other','coordSys-other','weather-other','instrument-other'].forEach(id => {
-    const key = id.replace('-','').replace('other','Other').replace('weather','weatherO').replace('instrument','instrumentO');
-    // map back
-  });
   if(d.workTypeOther)    { setVal('workType-other', d.workTypeOther); if(d.workType==='Other') { const el=document.getElementById('workType-other'); if(el) el.style.display='block'; } }
   if(d.coordSysOther)    { setVal('coordSys-other', d.coordSysOther); if(d.coordSys==='Other') { const el=document.getElementById('coordSys-other'); if(el) el.style.display='block'; } }
   if(d.weatherOther)     { setVal('weather-other', d.weatherOther); }
   if(d.instrumentOther)  { setVal('instrument-other', d.instrumentOther); }
 
-  // Surveyors
+  // Restore checkedBy dropdown
+  const cbSel = document.getElementById('checkedBy');
+  const cbOther = document.getElementById('checkedBy-other');
+  if (cbSel && d.checkedBy) {
+    const isKnown = [...cbSel.options].some(o => o.value === d.checkedBy);
+    if (isKnown) {
+      cbSel.value = d.checkedBy;
+    } else {
+      cbSel.value = 'Other';
+      if (cbOther) { cbOther.value = d.checkedBy; cbOther.style.display = 'block'; }
+    }
+  }
+
+  // Surveyors — restore as dropdowns
   document.getElementById('surveyor-list').innerHTML = '';
   const surveyors = d.surveyors || [];
   if(surveyors.length === 0) { addSurveyor(); }
   else { surveyors.forEach(name => addSurveyor(name)); }
+  syncSignName();
 
   // Weather checkboxes
   document.querySelectorAll('#weather-group .check-item').forEach(el => {
@@ -1139,6 +1301,14 @@ function restoreForm(d) {
     const otherId = el.getAttribute('data-other');
     if(otherId && match && d.instrumentOther) document.getElementById(otherId).style.display = 'block';
   });
+  // Rebuild serial list, then restore any manually edited serials
+  updateSerialList();
+  if (d.instrSerials && d.instrSerials.length) {
+    d.instrSerials.forEach(entry => {
+      const inp = document.querySelector(`#serial-list input[data-instrument="${entry.name}"]`);
+      if (inp && entry.serial) inp.value = entry.serial;
+    });
+  }
 
   // GCP checklist
   if(d.gcpChecklist) {
